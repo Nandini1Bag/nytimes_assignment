@@ -1,0 +1,11 @@
+.article-tiles-cont {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 100px;
+  padding-bottom: 30px;
+  justify-content: flex-start;
+}
+
+.articles-page {
+  background: #f4f3f1;
+}
