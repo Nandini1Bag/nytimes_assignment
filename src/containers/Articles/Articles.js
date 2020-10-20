@@ -1,108 +1,83 @@
-import React, { Component } from 'react';
-import axios from 'axios';
-import { Route } from 'react-router-dom';
-import ReactPaginate from 'react-paginate';
+import React, { useState, useEffect, Fragment } from "react";
+import axios from "axios";
 
-import ArticleTile from '../../components/ArticleTile/ArticleTile';
-import './Articles.css';
+import ArticleTile from "../../components/ArticleTile/ArticleTile";
+import Pagination from "../../components/Pagination/Pagination";
+import "./Articles.css";
 
-class Articles extends Component{
- 
-    constructor(props) {
-      super(props);
-      this.state = {
-        offset: 0,
-        articledata:[],
-        perPage: 10,
-        currentPage: 0
-      };
-      this.handlePageClick = this
-          .handlePageClick
-          .bind(this);
-  }
+const Articles = () => {
+  const [isLoading, updateLoading] = useState(true);
+  const [articledata, setArticleData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
-    receivedData() {
-      console.log(this.props);
-      axios.get("https://api.nytimes.com/svc/mostpopular/v2/emailed/7.json?api-key=rOdFTBy8ifr0y2EhhG72MUmeGGADIl5s")
-      .then(response => {
-           const data = response.data.results;
-           this.setState({articledata:data})
-        //        this.setState({pageCount: Math.ceil(data.length / this.state.perPage),           
-        //     articles
-        // })
-      }).catch(error => {
-       console.log(error); 
-      // this.setState({error:true})  ; 
-      });      
-  }
+  const articlesPerPage = 8;
 
-  handlePageClick = (e) => {
-    const selectedPage = e.selected;
-    const offset = selectedPage * this.state.perPage;
+  useEffect(() => {
+    axios
+      .get(
+        "https://api.nytimes.com/svc/mostpopular/v2/emailed/7.json?api-key=rOdFTBy8ifr0y2EhhG72MUmeGGADIl5s"
+      )
+      .then((response) => {
+        const data = response.data.results;
+        setArticleData(data);
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        setArticleData([]);
+      })
+      .finally(() => {
+        updateLoading(false);
+      });
+  }, []);
 
-    this.setState({
-        currentPage: selectedPage,
-        offset: offset
-    }, () => {
-        this.receivedData()
-    });
+  const articles = (() => {
+    const indexOfLastArticle = currentPage * articlesPerPage;
+    const indexOfFirstArticle = indexOfLastArticle - articlesPerPage;
+    const currentArticles = articledata.slice(
+      indexOfFirstArticle,
+      indexOfLastArticle
+    );
+    return currentArticles.map((article) => (
+      <ArticleTile
+        key={article.id}
+        title={article.title}
+        url={article.url}
+        author={article.byline}
+        updated={article.updated}
+        source={article.source}
+        media={article.media}
+        clicked={() => {
+          this.postSelectedHandler(article.id);
+        }}
+      />
+    ));
+  })();
 
-  }
+  const handlePaginationClick = (event) => {
+    setCurrentPage(+event.target.id);
+  };
 
-    componentDidMount(){
-      this.receivedData();       
-    };
-
-    postSelectedHandler=(id)=>{
-      //  this.setState({selectedPostId:id});
-     this.props.history.push({pathname: '/' + id});    
-     //Alternative
-     //this.props.history.push( '/' + id); 
-    }
-
-    render(){
-        let articles= <p style={{textAlign:"center"}}>Something went wrong</p>
-        if (! this.state.error){
-          const data = this.state.articledata;
-          articles=data.map(article=>{
-              return  (
-                 <ArticleTile 
-                         key={article.id}
-                         title={article.title} 
-                         url={article.url}
-                         author={article.byline}
-                         publisheddate={article.published_date}
-                         media={article.media}
-                         clicked={()=>{this.postSelectedHandler(article.id)}}/>
-              )
-          });
-       
-      
-        }
-        return(
-          <div className="divarticles">
-          <section className="articles">
-            <ul className="articleTiles">
-            {articles}
-            </ul>
-          </section>
-          {/* <Route path={this.props.match.url + '/:id' } exact component={FullPost}/>   */}
-          <ReactPaginate
-                  previousLabel={"prev"}
-                  nextLabel={"next"}
-                  breakLabel={"..."}
-                  breakClassName={"break-me"}
-                  pageCount={this.state.pageCount}
-                  marginPagesDisplayed={2}
-                  pageRangeDisplayed={5}
-                  onPageChange={this.handlePageClick}
-                  containerClassName={"pagination"}
-                  subContainerClassName={"pages pagination"}
-                  activeClassName={"active"}/>
-          </div>
-
-        )
-    }
-}
+  return (
+    <section className="articles-page">
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : !articles.length ? (
+        <li>No Data found</li>
+      ) : (
+        <Fragment>
+          {articledata.length > articlesPerPage && (
+            <Pagination
+              countPerPage={articlesPerPage}
+              totalCount={articledata.length}
+              currentPage={currentPage}
+              onChange={handlePaginationClick}
+            />
+          )}
+          <ul className="article-tiles-cont">{articles}</ul>
+        </Fragment>
+      )}
+    </section>
+  );
+};
 
 export default Articles;

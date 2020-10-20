@@ -1,7 +1,7 @@
 {
   "name": "react",
   "version": "1.0.0",
-  "description": "React example starter project",
+  "description": "articles with pagination",
   "keywords": [
     "react",
     "starter"
@@ -11,13 +11,7 @@
     "axios": "^0.20.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
-    "react-paginate": "^6.5.0",
-    "react-router": "^5.2.0",
-    "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3"
-  },
-  "devDependencies": {
-    "typescript": "3.8.3"
   },
   "scripts": {
     "start": "react-scripts start",
