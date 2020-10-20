@@ -10,7 +10,7 @@ const Articles = () => {
   const [articledata, setArticleData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const articlesPerPage = 8;
+  const articlesPerPage = 6;
 
   useEffect(() => {
     axios

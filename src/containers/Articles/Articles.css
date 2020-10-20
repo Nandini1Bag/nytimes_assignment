@@ -1,8 +1,7 @@
 .article-tiles-cont {
   display: flex;
   flex-wrap: wrap;
-  padding: 100px;
-  padding-bottom: 30px;
+  padding: 30px 100px;
   justify-content: flex-start;
 }
 
